@@ -64,7 +64,9 @@ class push_service extends rcube
         $plugin->load_config();
 
         $host       = $this->config->get('push_service_host') ?: "0.0.0.0";
-        $port       = $this->config->get('push_service_post') ?: 9501;
+        $port       = $this->config->get('push_service_port') ?: 9501;
+        $mode       = $this->config->get('push_service_mode') ?: 2;
+        $sock_type  = $this->config->get('push_service_sock_type') ?: 1;
         $cache_size = $this->config->get('push_cache_size') ?: 1024;
 
         $this->debug   = $this->config->get('push_debug', false);
@@ -73,7 +75,7 @@ class push_service extends rcube
         $this->parser  = new push_parser_notify;
 
         // Setup the server
-        $this->server = new swoole_websocket_server($host, $port); // TODO: SSL
+        $this->server = new swoole_websocket_server($host, $port, $mode, $sock_type);
         $this->server->set((array) $this->config->get('push_service_config'));
         $this->server->on('open', array($this, 'http_open'));
         $this->server->on('message', array($this, 'http_message'));
