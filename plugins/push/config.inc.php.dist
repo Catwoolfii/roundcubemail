@@ -9,28 +9,62 @@
 // %d - domain (http hostname $_SERVER['HTTP_HOST'] without the first part)
 // %z - IMAP domain (IMAP hostname without the first part)
 // %p - Port specified in $config['push_service_port'] (or 9501 if unset)
-$config['push_url'] = 'wss://%n:%p';
+$config['push_url'] = 'wss://%n:9501';
 
 // To which IP/Port the service should bind to
-// Note: The service need to be accessible by web browsers and notification services
+// You can listen on 0.0.0.0 to bind to all addresses on IPv4
+// and listen on :: to bind to all addresses on  IPv6
 $config['push_service_host'] = '0.0.0.0';
 $config['push_service_port'] = 9501;
+// 1 => Reactor based mode (like nginx, nodejs), 2 => Multi process mode (like php-fpm)
+$config['push_service_mode'] = 2;
+// 1 => TCPv4, 3 => TCPv6, 513 => TCPv4/SSL (must add cert & key)
+$config['push_service_sock_type'] = 513;
 
 // Additional security token that external services will have to set
 // when connecting to http service of the plugin. The token can be specified
 // either in X-Token header, or Authorization header with value "Bearer <token>".
-$config['push_token'] = null;
+// You must use it: openssl rand -base64 16
+$config['push_token'] = 'eRdIklqbt8Im33tfHE4DEA==';
 
 // HTTP service configuration. For all available options see:
 // https://www.swoole.co.uk/docs/modules/swoole-server/configuration
 $config['push_service_config'] = array(
-    // 'chroot' => INSTALL_PATH,
-    // 'heartbeat_idle_time' => 600,
-    // 'heartbeat_check_interval' => 60,
-    // 'pid_file' => 'server.pid',
-    // 'ssl_cert_file' => 'ssl.cert', // PEM not DER
-    // 'ssl_key_file' => 'ssl.key', // PEM not DER
-    // 'ssl_ciphers' => '',
+    'daemonize' => true,
+    'chroot' => INSTALL_PATH,
+    'pid_file' => '/var/run/php/swoole.pid',
+    'ssl_cert_file' => __DIR__. '/niks_su.pem',
+    'ssl_key_file' => __DIR__. '/niks_su.key',
+    // 0 => DEBUG, 2 => INFO
+    'log_level' => 1,
+    'log_file' => '/var/log/swoole/swoole.log',
+    'log_rotation' => 2,
+    'log_date_format' => '%Y-%m-%d %H:%M:%S',
+    'log_date_with_microseconds' => false,
+    'trace_flags' => 9223372036854775807,
+    'max_conn' => 1024,
+    'backlog' => 512,
+    // for SIMPLE_MODE, default per cpu num
+    //'reactor_num' => 4,
+    // default per cpu num
+    //'worker_num' => 4,
+    // for sync
+    //'task_worker_num' => 16,
+    // 0 => for async, 1000 => for sync
+    //'max_request' => 0,
+    // 1 => round_robin, 2 => fixed_by_id, 3 => connect_to_idle,
+    // 4 => fixed_by_ip, 5 => fixed_by_uid, 6 => simple_mode,
+    //'dispatch_mode' => 2,
+    'open_tcp_nodelay' => true,
+    'open_tcp_keepalive' => true,
+    'heartbeat_idle_time' => 600,
+    'heartbeat_check_interval' => 60,
+    'open_eof_check' => true,
+    'open_eof_split' => true,
+    'package_eof' => "\r\n",
+    'http_compression' => true,
+    'http_compression_level' => 4,
+    'compression_min_length' => 20,
 );
 
 // Shared-memory cache size (maximum number of records).
@@ -38,4 +72,4 @@ $config['push_service_config'] = array(
 $config['push_cache_size'] = 1024;
 
 // Enables debug logging for http service (<log_dir>/push) and browser console
-$config['push_debug'] = false;
+$config['push_debug'] = true;
