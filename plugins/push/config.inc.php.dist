@@ -25,7 +25,7 @@ $config['push_service_sock_type'] = 513;
 // when connecting to http service of the plugin. The token can be specified
 // either in X-Token header, or Authorization header with value "Bearer <token>".
 // You must use it: openssl rand -base64 16
-$config['push_token'] = 'eRdIklqbt8Im33tfHE4DEA==';
+$config['push_token'] = null;
 
 // HTTP service configuration. For all available options see:
 // https://www.swoole.co.uk/docs/modules/swoole-server/configuration
@@ -33,8 +33,8 @@ $config['push_service_config'] = array(
     'daemonize' => true,
     'chroot' => INSTALL_PATH,
     'pid_file' => '/var/run/php/swoole.pid',
-    'ssl_cert_file' => __DIR__. '/niks_su.pem',
-    'ssl_key_file' => __DIR__. '/niks_su.key',
+    'ssl_cert_file' => __DIR__. '/example.pem',
+    'ssl_key_file' => __DIR__. '/example.key',
     // 0 => DEBUG, 2 => INFO
     'log_level' => 1,
     'log_file' => '/var/log/swoole/swoole.log',
